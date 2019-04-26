@@ -18,9 +18,6 @@ firebase.initializeApp(config);
 firebase.firestore.FieldValue.arrayUnion({});
 export const auth = firebase.auth();
 export const db = firebase.firestore();
-export const waktukonsulschemaadd = (waktu, status) =>
-  firebase.firestore.FieldValue.arrayUnion({ waktu, status });
-export const waktukonsulschemaaremove = (waktu, status) =>
-  firebase.firestore.FieldValue.arrayRemove({ waktu, status });
+export const timestamp = firebase.firestore.Timestamp;
 export const functions = firebase.functions();
 export const storage = firebase.storage();

@@ -16,9 +16,9 @@ export function dataUpdate(id, doc) {
     payload: { id, doc }
   };
 }
-export function dataDelete(id, doc) {
+export function dataDelete(id) {
   return {
     type: "JADWAL_DATA_DELETE",
-    payload: { id, doc }
+    payload: id
   };
 }

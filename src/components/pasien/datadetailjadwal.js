@@ -65,22 +65,24 @@ class Data extends Component {
     };
   }
   componentDidMount() {
-    this.unregisterAdminDbListener = this.collection.onSnapshot(snap => {
-      snap.docChanges().forEach(change => {
-        if (change.type === "added") {
-          this.props.dataAdd(change.doc.id, change.doc.data());
-        }
-        if (change.type === "modified") {
-          this.props.dataUpdate(change.doc.id, change.doc.data());
-        }
-        if (change.type === "removed") {
-          this.props.dataDelete(change.doc.id, change.doc.data());
-        }
+    this.unregisterAdminDbListener = this.collection
+      .orderBy("waktu", "desc")
+      .onSnapshot(snap => {
+        snap.docChanges().forEach(change => {
+          if (change.type === "added") {
+            this.props.dataAdd(change.doc.id, change.doc.data());
+          }
+          if (change.type === "modified") {
+            this.props.dataUpdate(change.doc.id, change.doc.data());
+          }
+          if (change.type === "removed") {
+            this.props.dataDelete(change.doc.id, change.doc.data());
+          }
+        });
       });
-    });
   }
-  createNewKonsul = (type, subid, waktu) => {
-    if (type === "Add") return this.collection.doc(subid).set({ waktu });
+  createNewKonsul = (type, subid, data) => {
+    if (type === "Add") return this.collection.doc(subid).set(data);
     else if (type === "Delete") return this.collection.doc(subid).delete();
   };
   componentWillUnmount() {
@@ -117,7 +119,8 @@ class Data extends Component {
             )
           }}
           columns={[
-            { title: "Waktu", field: "waktu" },
+            { title: "Tanggal", field: "tanggal" },
+            { title: "Jam", field: "jam" },
             { title: "Status", field: "status" },
             { title: "Keterangan", field: "keterangan" },
             {

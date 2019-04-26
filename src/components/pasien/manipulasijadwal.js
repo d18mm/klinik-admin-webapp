@@ -46,12 +46,18 @@ export class CreateNewRoom extends React.Component {
       dokter: "",
       waktu: new Date()
     });
+
+    const tanggal = moment(waktu).format("DD/MM/YYYY");
+    const jam = moment(waktu).format("HH:mm");
     const postRoomJadwal = {
       dokter: db.doc(`user/${dokter}`),
       pasien: db.doc(`user/${this.pasien}`)
     };
+
     const postJadwalInRoom = {
-      waktu
+      waktu,
+      tanggal,
+      jam
     };
     return this.props.event(
       { type, roomid, subid },
@@ -111,41 +117,36 @@ export class CreateNewRoom extends React.Component {
             </Button>
           </Toolbar>
         </AppBar>
-        <form className={classes.containers} noValidate autoComplete="off">
-          <Grid container spacing={24}>
-            <Grid item xs={12} className={classes.textField}>
-              <SingleSelect
-                value={this.state.dokter}
-                disabled={this.state.type !== "Create"}
-                placeholder="Nama Dokter..."
-                options={this.props.datadokter.map(it => ({
-                  label: it.nama,
-                  value: it.id
-                }))}
-                onChange={v => this.setState({ dokter: v })}
-              />
-            </Grid>
-            <Grid item xs={12} className={classes.textField}>
-              <FormLabel component="legend">Waktu Konsul</FormLabel>
-              <DatePicker
-                popperPlacement="left"
-                selected={this.state.waktu}
-                className={classes.textDate}
-                onChange={v =>
-                  this.setState({
-                    waktu: moment(v)
-                      .locale("id")
-                      .toDate()
-                  })
-                }
-                showTimeSelect
-                timeFormat="HH:mm"
-                dateFormat="dd MMMM yyyy HH:mm"
-                timeCaption="time"
-              />
-            </Grid>
+        <Grid container spacing={24} style={{ padding: 20 }}>
+          <Grid item xs={6}>
+            <SingleSelect
+              value={this.state.dokter}
+              disabled={this.state.type !== "Create"}
+              placeholder="Nama Dokter..."
+              options={this.props.datadokter.map(it => ({
+                label: it.nama,
+                value: it.id
+              }))}
+              onChange={v => this.setState({ dokter: v })}
+            />
           </Grid>
-        </form>
+          <Grid item xs={6}>
+            <DatePicker
+              popperPlacement="top-end"
+              selected={this.state.waktu}
+              className={classes.textDate}
+              onChange={waktu =>
+                this.setState({
+                  waktu
+                })
+              }
+              showTimeSelect
+              timeFormat="HH:mm"
+              dateFormat="dd/MM/yyyy HH:mm"
+              timeCaption="time"
+            />
+          </Grid>
+        </Grid>
       </Dialog>
     );
   }
@@ -231,18 +232,21 @@ export class CreateNewKonsul extends React.Component {
     this.setState({
       type: "Delete",
       subid: rowData.id,
-      waktu: new Date(rowData.waktu)
+      waktu: rowData.waktu.toDate()
     });
   };
   buttonClick = () => {
     const { type, waktu, subid } = this.state;
-    console.log(this.pasien);
+    const tanggal = moment(waktu).format("DD/MM/YYYY");
+    const jam = moment(waktu).format("HH:mm");
+    console.log(tanggal);
     this.setState({
       type: "",
       subid: "",
       waktu: new Date()
     });
-    return this.props.event(type, subid, waktu);
+
+    return this.props.event(type, subid, { waktu, tanggal, jam });
   };
 
   render() {
@@ -282,25 +286,22 @@ export class CreateNewKonsul extends React.Component {
             </Button>
           </Toolbar>
         </AppBar>
-        <Grid container item xs={12} className={classes.textField}>
+        <Grid container spacing={24} style={{ padding: 20 }}>
           <FormLabel component="legend" className={classes.textDate}>
             Waktu Konsul
           </FormLabel>
           <DatePicker
-            popperPlacement="right"
+            popperPlacement="top"
             selected={this.state.waktu}
             className={classes.textDate}
-            timeIntervals={15}
-            onChange={v =>
+            onChange={waktu =>
               this.setState({
-                waktu: moment(v)
-                  .locale("id")
-                  .toDate()
+                waktu
               })
             }
             showTimeSelect
             timeFormat="HH:mm"
-            dateFormat="dd MMMM yyyy HH:mm"
+            dateFormat="dd/MM/yyyy HH:mm"
             timeCaption="time"
           />
         </Grid>

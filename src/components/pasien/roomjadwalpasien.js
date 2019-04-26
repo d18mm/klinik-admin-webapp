@@ -46,8 +46,8 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 2
   },
   textDate: {
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 2
+    marginTop: theme.spacing.unit * 1,
+    marginBottom: theme.spacing.unit * 1
   },
   formControl: {
     margin: theme.spacing.unit * 2,
@@ -70,12 +70,6 @@ class JadwalPasien extends Component {
       message: { open: false, msg: "" }
     };
   }
-  // async componentWillMount() {
-  //   const mdokter = await this.collectionUser
-  //     .where("level", "==", "DOKTER")
-  //     .get();
-  //   mdokter.docs.forEach(it => this.props.dokterAdd(it.id, it.data()));
-  // }
   componentDidMount() {
     this.collectionUser
       .where("level", "==", "DOKTER")
@@ -103,31 +97,6 @@ class JadwalPasien extends Component {
           );
         });
       });
-    // this.unregisjadwalDB = this.collection
-    //   .where("pasien", "==", this.collectionUser.doc(this.idpasien))
-    //   .onSnapshot(snap => {
-    //     snap.docChanges().forEach(change => {
-    //       if (change.type === "added") {
-    //         change.doc
-    //           .get("dokter")
-    //           .get()
-    //           .then(dokterData => {
-    //             this.props.dataAdd(
-    //               change.doc.id,
-    //               change.doc.data(),
-    //               dokterData.id,
-    //               dokterData.data()
-    //             );
-    //           });
-    //       }
-    //       if (change.type === "modified") {
-    //         this.props.dataUpdate(change.doc.id, change.doc.data());
-    //       }
-    //       if (change.type === "removed") {
-    //         this.props.dataDelete(change.doc.id, change.doc.data());
-    //       }
-    //     });
-    //   });
   }
   manipulasiEvent = async (
     { type, roomid, subid },
@@ -148,7 +117,15 @@ class JadwalPasien extends Component {
               .collection("konsul")
               .doc(subid)
               .set(postJadwalInRoom)
-          ]);
+          ]).then(() => {
+            const dokter = this.props.dokter.data[postRoomJadwal.dokter.id];
+            this.props.dataAdd(
+              roomid,
+              postRoomJadwal,
+              postRoomJadwal.dokter.id,
+              dokter
+            );
+          });
         }
         throw new Error("Pasien Or Dokter Not Exists");
       }
@@ -158,7 +135,12 @@ class JadwalPasien extends Component {
   };
   deleteRoom = async (roomid, dokter) => {
     try {
-      return this.collection.doc(roomid).delete();
+      return this.collection
+        .doc(roomid)
+        .delete()
+        .then(() => {
+          this.props.dataDelete(roomid);
+        });
     } catch (error) {
       this.setState({ message: { open: true, msg: error.message || error } });
     }

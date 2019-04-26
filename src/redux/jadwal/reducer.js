@@ -14,7 +14,7 @@ const adminreducer = (
       state.data[action.payload.id] = { ...action.payload.doc };
       return { ...state };
     case "JADWAL_DATA_DELETE":
-      delete state.data[action.payload.id];
+      delete state.data[action.payload];
       return { ...state };
     default:
       return state;

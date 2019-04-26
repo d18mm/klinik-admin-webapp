@@ -12,6 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Notif from "../view/notif";
 import { auth } from "../../firebase";
+import { isEmail, isEmpty } from "validator";
 
 const styles = theme => ({
   main: {
@@ -51,9 +52,24 @@ function Login(props) {
   const [password, setPassword] = useState("");
   const { classes } = props;
   const loginClick = () => {
-    return auth.signInWithEmailAndPassword(email, password).catch(e => {
-      setMessage({ open: true, msg: e.message || e });
-    });
+    if (isEmail(email) && !isEmpty(password))
+      return auth.signInWithEmailAndPassword(email, password).catch(e => {
+        setMessage({ open: true, msg: e.message || e });
+      });
+  };
+  const lupaPassword = () => {
+    if (isEmail(email))
+      return auth
+        .sendPasswordResetEmail(email)
+        .then(() =>
+          setMessage({
+            open: true,
+            msg: "Cek inbox di email untuk reset password"
+          })
+        )
+        .catch(e => {
+          setMessage({ open: true, msg: e.message || e });
+        });
   };
   return (
     <main className={classes.main}>
@@ -98,7 +114,17 @@ function Login(props) {
             onClick={loginClick}
             className={classes.submit}
           >
-            Sign in
+            Login
+          </Button>
+          <Button
+            type="button"
+            fullWidth
+            variant="text"
+            color="primary"
+            onClick={lupaPassword}
+            className={classes.submit}
+          >
+            Lupa Password ?
           </Button>
         </form>
       </Paper>
